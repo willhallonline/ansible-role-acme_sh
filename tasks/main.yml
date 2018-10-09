@@ -1,0 +1,158 @@
+---
+- name: Include OS-specific variables for Fedora or FreeBSD.
+  include_vars: "{{ ansible_distribution }}.yml"
+  when: ansible_distribution == 'FreeBSD' or ansible_distribution == 'Fedora'
+
+- name: Include version-specific variables for CentOS/RHEL.
+  include_vars: "RedHat-{{ ansible_distribution_version.split('.')[0] }}.yml"
+  when: ansible_distribution == 'CentOS' or
+        ansible_distribution == 'Red Hat Enterprise Linux' or
+        ansible_distribution == 'RedHat'
+
+- name: Include version-specific variables for Ubuntu.
+  include_vars: "{{ ansible_distribution }}-{{ ansible_distribution_version.split('.')[0] }}.yml"
+  when: ansible_distribution == 'Ubuntu'
+
+- name: Include version-specific variables for Debian.
+  include_vars: "{{ ansible_distribution|title }}-{{ ansible_distribution_version.split('.')[0] }}.yml"
+  when: ansible_os_family == 'Debian'
+
+- name: Define acme_packages.
+  set_fact:
+    acme_packages: "{{ __acme_packages | list }}"
+  when: acme_packages is not defined
+
+# Setup/install tasks.
+- include_tasks: setup-RedHat.yml
+  when: ansible_os_family == 'RedHat'
+
+- include_tasks: setup-Debian.yml
+  when: ansible_os_family == 'Debian'
+
+- include_tasks: setup-FreeBSD.yml
+  when: ansible_os_family == 'FreeBSD'
+
+- name: Add dedicated user
+  user:
+    name: "{{ acme_username }}"
+    shell: /usr/sbin/nologin
+    comment: For acme.sh
+    system: yes
+    home: /var/acme
+
+- name: Create PKI directory for acme
+  file:
+    path: "{{ acme_certificate_directory }}"
+    owner: "{{ acme_username }}"
+    group: "{{ acme_username }}"
+    mode: 0700
+    state: directory
+
+- name: Download acme.sh
+  get_url:
+    url: https://get.acme.sh
+    dest: /tmp/get.acme.sh
+    owner: "{{ acme_username }}"
+    group: "{{ acme_username }}"
+    mode: 0755
+
+- name: Install acme.sh
+  become_user: "{{ acme_username }}"
+  command: /tmp/get.acme.sh
+  args:
+    chdir: ~/
+    creates: "{{ acme_home_directory }}/.acme.sh/acme.sh"
+
+- name: Setup SSL Cert using Webroot
+  block:
+  - name: Issue certificate standalone for bootstrap webroot
+    shell: >
+      "{{ acme_home_directory }}/.acme.sh/acme.sh --issue {% for d in item.d %}-d {{ d }} {% endfor %}
+      --home ~acme/.acme.sh
+      --standalone
+      --certpath {{ acme_certificate_directory }}/{{ item.d[0] }}-cert.pem
+      --keypath {{ acme_certificate_directory }}/{{ item.d[0] }}-key.pem
+      --fullchainpath {{ acme_certificate_directory }}/{{ item.d[0] }}-fullchain.pem"
+    args:
+      creates: "{{ acme_certificate_directory }}/{{ item.d[0] }}-cert.pem"
+    with_items: "{{ acme_certificates }}"
+
+  - name: Create .well-known/acme-challenge
+    file:
+      state: directory
+      path: "{{ acme_webroot_directory }}/.well-known/acme-challenge"
+      owner: "{{ acme_username }}"
+      group: www-data
+
+  - name: Switch to webroot for certificate
+    become_user: "{{ acme_username }}"
+    lineinfile:
+      dest: "{{ acme_home_directory }}/.acme.sh/{{ item[0].d[0] }}/{{ item[0].d[0] }}.conf"
+      regexp: "^{{ item[1].k }}='.*'$"
+      line: "{{ item[1].k }}='{{ item[1].v }}'"
+    loop_control:
+      label: "{{ item[0].d[0] }} - {{ item[1].k }}={{ item[1].v }}"
+    with_nested:
+      - "{{ acme_certificates }}"
+      - - {k: "Le_Webroot", v: "{{ acme_webroot_directory }}"}
+
+  when: acme_method == 'webroot'
+
+- name: Setup SSL Cert using Route 53
+  block:
+  - name: Configure AWS API key
+    lineinfile:
+      dest: "{{ acme_home_directory }}/.acme.sh/account.conf"
+      regexp: "^{{ item.k }}='.*'$"
+      line: "{{ item.k }}='{{ item.v }}'"
+    loop_control:
+      # Don't expose the key in the log
+      label: "{{ item.k }}"
+    with_items:
+      - {k: "AWS_ACCESS_KEY_ID", v: "{{ acme_aws_access_key_id }}"}
+      - {k: "AWS_SECRET_ACCESS_KEY", v: "{{ acme_aws_secret_access_key }}"}
+
+  - name: Issue certificate using Route53 (This will take 40s due to DNS)
+    become_user: "{{ acme_username }}"
+    shell: >
+      "{{ acme_home_directory }}/.acme.sh/acme.sh --issue {% for d in item.d %}-d {{ d }} {% endfor %}
+      --dns dns_aws
+      --dnssleep 40
+      --certpath {{ acme_certificate_directory }}/{{ item.d[0] }}-cert.pem
+      --keypath {{ acme_certificate_directory }}/{{ item.d[0] }}-key.pem
+      --fullchainpath {{ acme_certificate_directory }}/{{ item.d[0] }}-fullchain.pem"
+    args:
+      creates: "{{ acme_certificate_directory }}/{{ item.d[0] }}-cert.pem"
+    with_items: "{{ acme_certificates }}"
+
+  - name: Change DNS Sleep to 120 seconds
+    become_user: "{{ acme_username }}"
+    lineinfile:
+      dest: "{{ acme_home_directory }}/.acme.sh/{{ item[0].d[0] }}/{{ item[0].d[0] }}.conf"
+      regexp: "^{{ item[1].k }}='.*'$"
+      line: "{{ item[1].k }}='{{ item[1].v }}'"
+    loop_control:
+      label: "{{ item[0].d[0] }} - {{ item[1].k }}={{ item[1].v }}"
+    with_nested:
+      - "{{ acme_certificates }}"
+      - - {k: "Le_DNSSleep", v: "120"}
+
+  when: acme_method == 'route53'
+
+- name: Give acme ownership of certificate directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ acme_username }}"
+    group: "{{ acme_username }}"
+    recurse: yes
+  with_items:
+    - "{{ acme_home_directory }}/.acme.sh"
+    - "{{ acme_certificate_directory }}"
+
+- name: Setup cron for managing renewal of certs
+  cron:
+    name: "Cron for acme.sh"
+    minute: "0"
+    hour: "0"
+    job: "/var/acme/.acme.sh/acme.sh --cron > /dev/null"
