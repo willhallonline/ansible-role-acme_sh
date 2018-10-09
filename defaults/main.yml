@@ -1,3 +1,4 @@
+---
 # A list of certificates to request, for more names in a single certificate
 # add them to the array, i.e. inside the [ ].
 acme_certificates:
