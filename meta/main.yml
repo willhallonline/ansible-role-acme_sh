@@ -2,6 +2,7 @@
 dependencies: []
 
 galaxy_info:
+  role_name: acme.sh
   author: willhallonline
   description: acme.sh for Linux
   company: "Will Hall Online"
