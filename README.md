@@ -1,6 +1,6 @@
 # Ansible Role: acme.sh
 
-[![Build Status](https://travis-ci.org/willhallonline/ansible-role-acme_sh.svg?branch=master)](https://travis-ci.org/willhallonline/ansible-role-acme_sh)
+[![Build Status](https://travis-ci.org/willhallonline/ansible-role-acme_sh.svg?branch=master)](https://travis-ci.org/willhallonline/ansible-role-acme_sh) ![Ansible Role](https://img.shields.io/ansible/role/30494.svg) ![Ansible Role](https://img.shields.io/ansible/role/d/30494.svg)
 
 Installs acme.sh for RedHat/CentOS and Debian/Ubuntu linux servers.
 
