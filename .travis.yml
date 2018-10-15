@@ -6,15 +6,18 @@ env:
   global:
     - ROLE_NAME: acme_sh
   matrix:
-    - MOLECULE_DISTRO: centos7
+    - MOLECULE_DISTRO: 2.7-alpine-3.8
       MOLECULE_DOCKER_COMMAND: /usr/lib/systemd/systemd
-    - MOLECULE_DISTRO: centos6
-    - MOLECULE_DISTRO: fedora27
-    - MOLECULE_DISTRO: ubuntu1804
-    - MOLECULE_DISTRO: ubuntu1604
-    - MOLECULE_DISTRO: ubuntu1404
-    - MOLECULE_DISTRO: debian9
-    - MOLECULE_DISTRO: debian8
+    - MOLECULE_DISTRO: 2.7-alpine-3.7
+    - MOLECULE_DISTRO: 2.7-alpine-3.6
+    - MOLECULE_DISTRO: 2.7-centos-7
+    - MOLECULE_DISTRO: 2.7-ubuntu-18.04
+    - MOLECULE_DISTRO: 2.7-ubuntu-16.04
+    - MOLECULE_DISTRO: 2.5-alpine-3.7
+    - MOLECULE_DISTRO: 2.5-alpine-3.6
+    - MOLECULE_DISTRO: 2.5-centos-7
+    - MOLECULE_DISTRO: 2.5-ubuntu-18.04
+    - MOLECULE_DISTRO: 2.5-ubuntu-16.04
 
 install:
   # Install test dependencies.
