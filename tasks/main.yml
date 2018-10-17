@@ -57,6 +57,7 @@
     mode: 0755
 
 - name: Install acme.sh
+  become: yes
   become_user: "{{ acme_username }}"
   command: /tmp/get.acme.sh
   args:
@@ -85,6 +86,7 @@
         group: www-data
 
     - name: Switch to webroot for certificate
+      become: yes
       become_user: "{{ acme_username }}"
       lineinfile:
         dest: "{{ acme_home_directory }}/.acme.sh/{{ item[0].d[0] }}/{{ item[0].d[0] }}.conf"
@@ -113,6 +115,7 @@
         - {k: "AWS_SECRET_ACCESS_KEY", v: "{{ acme_aws_secret_access_key }}"}
 
     - name: Issue certificate using Route53 (This will take 40s due to DNS)
+      become: yes
       become_user: "{{ acme_username }}"
       shell: >
         "{{ acme_home_directory }}/.acme.sh/acme.sh --issue {% for d in item.d %}-d {{ d }} {% endfor %}
@@ -126,6 +129,7 @@
       with_items: "{{ acme_certificates }}"
 
     - name: Change DNS Sleep to 120 seconds
+      become: yes
       become_user: "{{ acme_username }}"
       lineinfile:
         dest: "{{ acme_home_directory }}/.acme.sh/{{ item[0].d[0] }}/{{ item[0].d[0] }}.conf"
