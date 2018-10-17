@@ -6,15 +6,11 @@ env:
   global:
     - ROLE_NAME: acme_sh
   matrix:
-    - MOLECULE_DISTRO: 2.7-alpine-3.8
+    - MOLECULE_DISTRO: 2.7-ubuntu-18.04
       MOLECULE_DOCKER_COMMAND: /usr/lib/systemd/systemd
-    - MOLECULE_DISTRO: 2.7-alpine-3.7
-    - MOLECULE_DISTRO: 2.7-alpine-3.6
     - MOLECULE_DISTRO: 2.7-centos-7
     - MOLECULE_DISTRO: 2.7-ubuntu-18.04
     - MOLECULE_DISTRO: 2.7-ubuntu-16.04
-    - MOLECULE_DISTRO: 2.5-alpine-3.7
-    - MOLECULE_DISTRO: 2.5-alpine-3.6
     - MOLECULE_DISTRO: 2.5-centos-7
     - MOLECULE_DISTRO: 2.5-ubuntu-18.04
     - MOLECULE_DISTRO: 2.5-ubuntu-16.04
