@@ -11,4 +11,5 @@ acme_certificate_directory: /etc/acme
 acme_webroot_directory: /var/www/html
 
 # Default to use webroot, other options are "route53".
-acme_method: webroot
+# acme_method: webroot
+# acme_method: route53

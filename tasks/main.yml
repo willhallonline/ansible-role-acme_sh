@@ -23,13 +23,13 @@
   when: acme_packages is not defined
 
 # Setup/install tasks.
-- include_tasks: setup-RedHat.yml
+- include_tasks: install-RedHat.yml
   when: ansible_os_family == 'RedHat'
 
-- include_tasks: setup-Debian.yml
+- include_tasks: install-Debian.yml
   when: ansible_os_family == 'Debian'
 
-- include_tasks: setup-FreeBSD.yml
+- include_tasks: install-FreeBSD.yml
   when: ansible_os_family == 'FreeBSD'
 
 - name: Add dedicated user
