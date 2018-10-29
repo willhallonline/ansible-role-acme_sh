@@ -4,7 +4,7 @@ dependencies: []
 galaxy_info:
   role_name: acme.sh
   author: willhallonline
-  description: acme.sh for Linux
+  description: acme.sh Lets Encrypt Client for Linux
   company: "Will Hall Online"
   license: "license (BSD, MIT)"
   min_ansible_version: 2.4
@@ -36,3 +36,5 @@ galaxy_info:
     - web
     - security
     - letsencrypt
+    - ssl
+    - acme
