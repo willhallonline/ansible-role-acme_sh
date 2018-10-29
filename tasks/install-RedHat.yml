@@ -1,4 +1,3 @@
 ---
 - name: Ensure acme.sh dependencies are installed.
-  package: "name={{ item }} state=present"
-  with_items: "{{ acme_packages }}"
+  package: "name=u'{{ acme_packages }}' state=present"
