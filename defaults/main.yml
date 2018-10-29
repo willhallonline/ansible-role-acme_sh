@@ -1,8 +1,10 @@
 ---
 # A list of certificates to request, for more names in a single certificate
 # add them to the array, i.e. inside the [ ].
-acme_certificates:
-  - {d: ["{{ inventory_hostname }}"]}
+
+## Acme certificates generation:
+# acme_certificates:
+#  - {d: ["{{ inventory_hostname }}"]}
 
 # Setup acme username (group will be the same)
 acme_username: acme
@@ -11,5 +13,5 @@ acme_certificate_directory: /etc/acme
 acme_webroot_directory: /var/www/html
 
 # Default to use webroot, other options are "route53".
-# acme_method: webroot
+acme_method: webroot
 # acme_method: route53
