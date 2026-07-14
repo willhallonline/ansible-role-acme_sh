@@ -1,0 +1,32 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Check acme.sh is installed.
+      ansible.builtin.stat:
+        path: /var/acme/.acme.sh/acme.sh
+      register: acme_sh_script
+
+    - name: Assert acme.sh script exists and is executable.
+      ansible.builtin.assert:
+        that:
+          - acme_sh_script.stat.exists
+          - acme_sh_script.stat.executable
+
+    - name: Check acme user exists.
+      ansible.builtin.getent:
+        database: passwd
+        key: acme
+
+    - name: Check certificate directory.
+      ansible.builtin.stat:
+        path: /etc/acme
+      register: acme_cert_dir
+
+    - name: Assert certificate directory exists with correct mode.
+      ansible.builtin.assert:
+        that:
+          - acme_cert_dir.stat.isdir
+          - acme_cert_dir.stat.mode == '0700'

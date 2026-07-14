@@ -2,34 +2,33 @@
 dependencies: []
 
 galaxy_info:
-  role_name: acme.sh
+  role_name: acme_sh
+  namespace: willhallonline
   author: willhallonline
   description: acme.sh Lets Encrypt Client for Linux
   company: "Will Hall Online"
-  license: "license (BSD, MIT)"
-  min_ansible_version: 2.4
+  license: MIT
+  min_ansible_version: "2.15"
   platforms:
     - name: EL
       versions:
-        - 6
-        - 7
+        - "8"
+        - "9"
     - name: Fedora
       versions:
         - all
     - name: Debian
       versions:
-        - wheezy
-        - jessie
-        - stretch
+        - bullseye
+        - bookworm
     - name: Ubuntu
       versions:
-        - precise
-        - trusty
-        - xenial
-        - bionic
+        - focal
+        - jammy
+        - noble
     - name: FreeBSD
       versions:
-        - 10.2
+        - "13.2"
   galaxy_tags:
     - development
     - system

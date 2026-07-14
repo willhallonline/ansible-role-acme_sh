@@ -8,10 +8,18 @@
 
 # Setup acme username (group will be the same)
 acme_username: acme
-acme_home_directory: /var/home
+acme_home_directory: /var/acme
 acme_certificate_directory: /etc/acme
 acme_webroot_directory: /var/www/html
+
+# Group that owns the .well-known/acme-challenge directory.
+# Defaults per OS family (www-data on Debian, nginx on RedHat, www on FreeBSD).
+# acme_webroot_group: www-data
 
 # Default to use webroot, other options are "route53".
 acme_method: webroot
 # acme_method: route53
+
+## Required when acme_method is "route53":
+# acme_aws_access_key_id: ""
+# acme_aws_secret_access_key: ""
