@@ -1,4 +1,5 @@
 ---
 __acme_packages:
   - socat
+  - curl
 __acme_webroot_group: www

@@ -1,4 +1,6 @@
 ---
 __acme_packages:
   - socat
+  - curl
+  - cronie
 __acme_webroot_group: nginx

@@ -49,12 +49,12 @@
     mode: "0755"
 
 - name: Install acme.sh
-  become: true
-  become_user: "{{ acme_username }}"
   ansible.builtin.command: /tmp/get.acme.sh
   args:
     chdir: "{{ acme_home_directory }}"
     creates: "{{ acme_home_directory }}/.acme.sh/acme.sh"
+  environment:
+    HOME: "{{ acme_home_directory }}"
 
 - name: Setup SSL Cert using Webroot
   when: acme_method == 'webroot' and acme_certificates is defined
@@ -81,8 +81,6 @@
         mode: "0755"
 
     - name: Switch to webroot for certificate
-      become: true
-      become_user: "{{ acme_username }}"
       ansible.builtin.lineinfile:
         dest: "{{ acme_home_directory }}/.acme.sh/{{ item[0].d[0] }}/{{ item[0].d[0] }}.conf"
         regexp: "^{{ item[1].k }}='.*'$"
@@ -109,11 +107,10 @@
         - {k: "AWS_SECRET_ACCESS_KEY", v: "{{ acme_aws_secret_access_key }}"}
 
     - name: Issue certificate using Route53 (This will take 40s due to DNS)
-      become: true
-      become_user: "{{ acme_username }}"
       ansible.builtin.command: >
         {{ acme_home_directory }}/.acme.sh/acme.sh --issue
         {% for d in item.d %}-d {{ d }} {% endfor %}
+        --home {{ acme_home_directory }}/.acme.sh
         --dns dns_aws
         --dnssleep 40
         --certpath {{ acme_certificate_directory }}/{{ item.d[0] }}-cert.pem
@@ -124,8 +121,6 @@
       loop: "{{ acme_certificates }}"
 
     - name: Change DNS Sleep to 120 seconds
-      become: true
-      become_user: "{{ acme_username }}"
       ansible.builtin.lineinfile:
         dest: "{{ acme_home_directory }}/.acme.sh/{{ item[0].d[0] }}/{{ item[0].d[0] }}.conf"
         regexp: "^{{ item[1].k }}='.*'$"

@@ -1,4 +1,6 @@
 ---
 __acme_packages:
   - socat
+  - curl
+  - cron
 __acme_webroot_group: www-data
