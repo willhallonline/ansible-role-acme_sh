@@ -1,8 +1,23 @@
 # Ansible Role: acme.sh
 
-[![CI](https://github.com/willhallonline/ansible-role-acme_sh/actions/workflows/ci.yml/badge.svg)](https://github.com/willhallonline/ansible-role-acme_sh/actions/workflows/ci.yml) ![Ansible Role](https://img.shields.io/ansible/role/d/30494.svg)
+[![CI](https://github.com/willhallonline/ansible-role-acme_sh/actions/workflows/ci.yml/badge.svg)](https://github.com/willhallonline/ansible-role-acme_sh/actions/workflows/ci.yml) [![GitHub release](https://img.shields.io/github/v/release/willhallonline/ansible-role-acme_sh)](https://github.com/willhallonline/ansible-role-acme_sh/releases) ![Ansible Role](https://img.shields.io/ansible/role/d/30494.svg)
 
 Installs [acme.sh](https://github.com/acmesh-official/acme.sh) for RedHat/CentOS, Debian/Ubuntu and FreeBSD servers, and issues Let's Encrypt certificates via webroot or Route 53 DNS validation. A daily cron job handles certificate renewal.
+
+## Installation
+
+Install from Ansible Galaxy:
+
+```bash
+ansible-galaxy role install willhallonline.acme_sh
+```
+
+Or add to your `requirements.yml`:
+
+```yaml
+roles:
+  - name: willhallonline.acme_sh
+```
 
 ## Requirements
 
@@ -89,6 +104,10 @@ Tests run with [Molecule](https://ansible.readthedocs.io/projects/molecule/) usi
 pip3 install ansible molecule molecule-plugins[docker] docker
 MOLECULE_DISTRO=ubuntu2404 molecule test
 ```
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for release history.
 
 ## License
 
