@@ -1,6 +1,7 @@
 ---
+# curl is intentionally omitted: EL ships curl-minimal, which provides
+# /usr/bin/curl but conflicts with the full curl package.
 __acme_packages:
   - socat
-  - curl
   - cronie
 __acme_webroot_group: nginx
